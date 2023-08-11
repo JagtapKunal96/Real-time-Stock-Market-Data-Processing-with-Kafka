@@ -1,0 +1,70 @@
+
+## Create EC2 instance in AWS ##
+
+##Download Kafka tgz in machine ##
+wget https://downloads.apache.org/kafka/3.4.1/kafka_2.12-3.4.1.tgz
+
+## Unzip File ###
+
+tar -xvf kafka_2.12-3.4.1.tgz
+
+------------------------------------------------------------------------------------------
+java -version
+## Install Java ##
+sudo yum install java-1.8.0-openjdk  
+
+## Check Java version ##
+
+java -version
+------------------------------------------------------------------------------------------
+## Before start zookeper ##
+ cd kafka_2.12-3.4.1
+ {## change servier from privet ip DNA (IP) to public (IP) ##}
+  {#resoune: INFO Registered broker 0 at path /brokers/ids/0 with addresses: PLAINTEXT://{#Its will privet ip in kafka start.sh #}:9092, czxid          (broker epoch): 25 (kafka.zk.KafkaZkClient) #}
+
+## Change to publice ip command ##
+
+sudo nano config/server.properties
+
+- Change in (change at (advertised.listeners=plaintext: (your host name):9092))  (ctrl+x then y)
+------------------------------------------------------------------------------------------
+## Start Zoo-keeper: ##
+
+1. bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Open another window to start kafka
+
+But first ssh to to your ec2 machine as done above
+------------------------------------------------------------------------------------------
+
+## Start Kafka-server: ##
+
+Duplicate the session & enter in a new console --
+
+2.export KAFKA_HEAP_OPTS="-Xmx256M -Xms128M"  //alocate memory for kafka
+  cd kafka_2.12-3.4.1
+
+3.bin/kafka-server-start.sh config/server.properties
+  {After start kafka server check which ip kafka server using(INFO Registered broker 0 at path /brokers/ids/0 with addresses: PLAINTEXT://Public IP:9092, czxid (broker epoch): 46 (kafka.zk.KafkaZkClient))}
+
+------------------------------------------------------------------------------------------
+
+## Create the topic: ##
+
+Duplicate the session & enter in a new console --
+cd kafka_2.12-3.4.1
+4.bin/kafka-topics.sh --create --topic demo_testing2 --bootstrap-server {Put the Public IP of your EC2 Instance:9092} --replication-factor 1 --partitions 1
+
+------------------------------------------------------------------------------------------
+
+## Start Producer: ##
+
+5.bin/kafka-console-producer.sh --topic StockData --bootstrap-server {Put the Public IP of your EC2 Instance:9092}
+------------------------------------------------------------------------------------------
+
+## Start Consumer: ##
+
+Duplicate the session & enter in a new console --
+cd kafka_2.12-3.4.1
+
+6.bin/kafka-console-consumer.sh --topic StockData --bootstrap-server {Put the Public IP of your EC2 Instance:9092}
